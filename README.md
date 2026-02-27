@@ -33,7 +33,7 @@ This application implements comprehensive security measures including:
 
 For detailed security information, see [SECURITY.md](./SECURITY.md).
 
-## Setup Instructions
+## Quick Start Guide
 
 ### Prerequisites
 
@@ -41,39 +41,50 @@ For detailed security information, see [SECURITY.md](./SECURITY.md).
 - Anthropic API key ([get one here](https://console.anthropic.com/))
 - Google Search Console CSV export file
 
-### Installation
+### Step-by-Step Setup
 
-1. **Clone the repository**
+1. **Clone and install**
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/Samuel-Rath/arcadian-gsc-insights.git
    cd arcadian-gsc-insights
-   ```
-
-2. **Install dependencies**
-   ```bash
    npm install
    ```
 
-3. **Configure environment variables**
+2. **Configure your API key**
    
    Create a `.env.local` file in the project root:
    ```bash
    ANTHROPIC_API_KEY=sk-ant-your-api-key-here
    ANTHROPIC_MODEL=claude-sonnet-4-5-20250929
    ```
-
-4. **Upload your CSV file**
    
-   Once the server is running, use the file upload interface in the application to upload your Google Search Console CSV export. The file will be saved to `uploaded-data/arckeywords.csv`.
+   Don't have an API key? Get one at [console.anthropic.com](https://console.anthropic.com/)
 
-5. **Run the development server**
+3. **Start the application**
    ```bash
    npm run dev
    ```
-
-6. **Open the application**
    
-   Navigate to [http://localhost:3000](http://localhost:3000) in your browser.
+   The server will start on [http://localhost:3000](http://localhost:3000)
+
+4. **Upload your CSV file**
+   
+   Once the application loads in your browser:
+   
+   - Look for the **"Upload CSV File"** section at the top of the page
+   - Click the upload area or drag and drop your Google Search Console CSV file
+   - Supported file size: up to 500 MB
+   - The file will be automatically saved and processed
+   - You'll see a success message when the upload completes
+
+5. **View your data**
+   
+   After uploading:
+   - The chart will automatically load with your data (first load may take 30-60 seconds for large files)
+   - Use the date pickers to filter the date range
+   - Click "Generate Insights" to get AI-powered analysis of your data
+
+That's it! Your GSC data is now visualized and ready for analysis.
 
 ## Environment Variables
 
