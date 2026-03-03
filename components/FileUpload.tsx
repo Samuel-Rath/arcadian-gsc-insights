@@ -75,8 +75,11 @@ export default function FileUpload({ onUploadSuccess }: FileUploadProps) {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 mb-6">
-      <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4">
+    <div className="bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300 p-4 sm:p-6 mb-6 border border-gray-100">
+      <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4 flex items-center gap-2">
+        <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+        </svg>
         Upload CSV File
       </h2>
 
@@ -115,9 +118,9 @@ export default function FileUpload({ onUploadSuccess }: FileUploadProps) {
             <div className="flex flex-col sm:flex-row items-center justify-center gap-2 text-sm text-gray-600">
               <label
                 htmlFor="file-upload"
-                className="relative cursor-pointer rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none"
+                className="relative cursor-pointer rounded-md font-medium text-blue-600 hover:text-blue-700 focus-within:outline-none transition-colors duration-200"
               >
-                <span>Upload a file</span>
+                <span className="underline decoration-2 decoration-blue-400 hover:decoration-blue-600">Upload a file</span>
                 <input
                   id="file-upload"
                   name="file-upload"
