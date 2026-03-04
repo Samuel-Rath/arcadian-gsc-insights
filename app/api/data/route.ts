@@ -1,87 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getCacheOrBuild } from '@/lib/cache';
-import { DailyAggregate } from '@/types';
-import { validateDateRange, sanitizeErrorMessage } from '@/lib/security';
-
-/**
- * Get default date range (last 30 days).
- * 
- * Used when user doesn't specify start/end parameters.
- * Provides a reasonable default view of recent data.
- */
-function getDefaultDateRange(): { start: string; end: string } {
-  const end = new Date();
-  const start = new Date();
-  start.setDate(start.getDate() - 30);
-  
-  return {
-    start: start.toISOString().split('T')[0],
-    end: end.toISOString().split('T')[0],
-  };
-}
-
-/**
- * Filter aggregates by date range.
- * 
- * Uses string comparison which works correctly for YYYY-MM-DD format
- * because it's lexicographically sortable.
- */
-function filterByDateRange(
-  aggregates: DailyAggregate[],
-  start: string,
-  end: string
-): DailyAggregate[] {
-  return aggregates.filter((agg) => {
-    return agg.date >= start && agg.date <= end;
-  });
-}
-
-/**
- * Calculate summary statistics from filtered aggregates.
- * 
- * Uses weighted averaging for CTR and position to ensure accuracy.
- * See aggregator.ts for detailed explanation of weighted metrics.
- */
-function calculateSummary(
-  series: DailyAggregate[],
-  startDate: string,
-  endDate: string
-) {
-  if (series.length === 0) {
-    return {
-      totalClicks: 0,
-      totalImpressions: 0,
-      avgCtr: 0,
-      avgPosition: 0,
-      startDate,
-      endDate,
-    };
-  }
-  
-  const totalClicks = series.reduce((sum, agg) => sum + agg.clicks, 0);
-  const totalImpressions = series.reduce((sum, agg) => sum + agg.impressions, 0);
-  
-  // Calculate weighted average CTR and position
-  let weightedCtrSum = 0;
-  let weightedPositionSum = 0;
-  
-  for (const agg of series) {
-    weightedCtrSum += agg.ctr * agg.impressions;
-    weightedPositionSum += agg.position * agg.impressions;
-  }
-  
-  const avgCtr = totalImpressions > 0 ? weightedCtrSum / totalImpressions : 0;
-  const avgPosition = totalImpressions > 0 ? weightedPositionSum / totalImpressions : 0;
-  
-  return {
-    totalClicks,
-    totalImpressions,
-    avgCtr,
-    avgPosition,
-    startDate,
-    endDate,
-  };
-}
+import { validateDateRange } from '@/lib/security';
+import { 
+  getDefaultDateRange, 
+  filterByDateRange, 
+  calculateSummary,
+  calculateDateRangeDays,
+  handleApiError 
+} from '@/lib/api-utils';
 
 /**
  * GET /api/data
@@ -138,10 +64,7 @@ export async function GET(request: NextRequest) {
     }
     
     // Warn if date range is very large (> 365 days)
-    // Large ranges can impact chart performance and insights quality
-    const startDate = new Date(start);
-    const endDate = new Date(end);
-    const daysDiff = Math.floor((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+    const daysDiff = calculateDateRangeDays(start, end);
     
     let warning = undefined;
     if (daysDiff > 365) {
@@ -166,51 +89,13 @@ export async function GET(request: NextRequest) {
     });
     
   } catch (error) {
-    // SECURITY: Sanitize error messages before logging
-    const originalError = (error as Error).message;
-    const sanitizedError = sanitizeErrorMessage(originalError);
-    console.error('Error in GET /api/data:', sanitizedError);
-    
-    // Handle specific error messages
-    const errorMessage = originalError;
-    
-    if (errorMessage.includes('CSV file not found')) {
-      return NextResponse.json(
-        { 
-          error: 'CSV file not found. Please ensure the data file exists at the configured path.',
-          details: 'The application could not locate the CSV data file. Contact your administrator.'
-        },
-        { status: 500 }
-      );
-    }
-    
-    if (errorMessage.includes('Failed to build aggregates')) {
-      return NextResponse.json(
-        { 
-          error: 'Failed to process CSV data. The file may be corrupted or in an invalid format.',
-          details: errorMessage
-        },
-        { status: 500 }
-      );
-    }
-    
-    if (errorMessage.includes('Failed to write cache')) {
-      return NextResponse.json(
-        { 
-          error: 'Failed to cache data. The application may not have write permissions.',
-          details: 'Data was processed but could not be cached for future use.'
-        },
-        { status: 500 }
-      );
-    }
-    
-    // Generic error response
+    const errorResponse = handleApiError(error, 'GET /api/data');
     return NextResponse.json(
       { 
-        error: 'An unexpected error occurred while loading data.',
-        details: errorMessage
+        error: errorResponse.error,
+        details: errorResponse.details
       },
-      { status: 500 }
+      { status: errorResponse.status }
     );
   }
 }

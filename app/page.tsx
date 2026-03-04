@@ -1,168 +1,55 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import DateRangePicker from '@/components/DateRangePicker';
 import ClicksChart from '@/components/ClicksChart';
 import SummaryStats from '@/components/SummaryStats';
 import InsightsPanel from '@/components/InsightsPanel';
 import FileUpload from '@/components/FileUpload';
-import { DailyAggregate, InsightsResponse } from '@/types';
-
-interface Summary {
-  totalClicks: number;
-  totalImpressions: number;
-  avgCtr: number;
-  avgPosition: number;
-  startDate: string;
-  endDate: string;
-}
+import { useData } from '@/hooks/useData';
+import { useInsights } from '@/hooks/useInsights';
+import { useDateRange } from '@/hooks/useDateRange';
 
 export default function Home() {
-  // State management
-  const [dateRange, setDateRange] = useState({ startDate: '', endDate: '' });
-  const [chartData, setChartData] = useState<DailyAggregate[]>([]);
-  const [summary, setSummary] = useState<Summary | null>(null);
-  const [insights, setInsights] = useState<InsightsResponse | null>(null);
-  const [loadingData, setLoadingData] = useState(true);
-  const [loadingInsights, setLoadingInsights] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [insightsError, setInsightsError] = useState<string | null>(null);
-  const [isInitialLoad, setIsInitialLoad] = useState(true);
-  const [warning, setWarning] = useState<string | null>(null);
-
-  // Calculate default date range (last 30 days)
-  const getDefaultDateRange = () => {
-    const end = new Date();
-    const start = new Date();
-    start.setDate(start.getDate() - 30);
-
-    return {
-      startDate: start.toISOString().split('T')[0],
-      endDate: end.toISOString().split('T')[0],
-    };
-  };
-
-  // Fetch data from API
-  const fetchData = async (start: string, end: string) => {
-    setLoadingData(true);
-    setError(null);
-    setWarning(null);
-
-    try {
-      const response = await fetch(
-        `/api/data?start=${start}&end=${end}`
-      );
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || 'Failed to fetch data');
-      }
-
-      const data = await response.json();
-      setChartData(data.series);
-      setSummary(data.summary);
-      
-      // Set warning if present
-      if (data.warning) {
-        setWarning(data.warning);
-      }
-    } catch (err) {
-      let errorMessage = 'An error occurred while loading data';
-      
-      if (err instanceof Error) {
-        // Network errors (fetch failed)
-        if (err.message === 'Failed to fetch' || err.name === 'TypeError') {
-          errorMessage = 'Network error: Unable to connect to the server. Please check your connection and try again.';
-        } else {
-          errorMessage = err.message;
-        }
-      }
-      
-      setError(errorMessage);
-      console.error('Error fetching data:', err);
-    } finally {
-      setLoadingData(false);
-      setIsInitialLoad(false);
-    }
-  };
-
-  // Fetch insights from API
-  const fetchInsights = async () => {
-    if (!dateRange.startDate || !dateRange.endDate) {
-      setInsightsError('Please select a date range first');
-      return;
-    }
-
-    setLoadingInsights(true);
-    setInsightsError(null);
-
-    try {
-      const response = await fetch('/api/insights', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          startDate: dateRange.startDate,
-          endDate: dateRange.endDate,
-        }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || 'Failed to generate insights');
-      }
-
-      const data = await response.json();
-      setInsights(data);
-    } catch (err) {
-      let errorMessage = 'An error occurred while generating insights';
-      
-      if (err instanceof Error) {
-        // Network errors (fetch failed)
-        if (err.message === 'Failed to fetch' || err.name === 'TypeError') {
-          errorMessage = 'Network error: Unable to connect to the server. Please check your connection and try again.';
-        } else {
-          errorMessage = err.message;
-        }
-      }
-      
-      setInsightsError(errorMessage);
-      console.error('Error fetching insights:', err);
-    } finally {
-      setLoadingInsights(false);
-    }
-  };
+  // Custom hooks for state management
+  const { dateRange, setDateRange } = useDateRange();
+  const { 
+    chartData, 
+    summary, 
+    loading: loadingData, 
+    error, 
+    warning, 
+    isInitialLoad, 
+    fetchData 
+  } = useData();
+  const { 
+    insights, 
+    loading: loadingInsights, 
+    error: insightsError, 
+    generateInsights,
+    clearInsights 
+  } = useInsights();
 
   // Initialize with default date range on mount
   useEffect(() => {
-    const defaultRange = getDefaultDateRange();
-    setDateRange(defaultRange);
-    fetchData(defaultRange.startDate, defaultRange.endDate);
-  }, []);
+    if (dateRange.startDate && dateRange.endDate) {
+      fetchData(dateRange.startDate, dateRange.endDate);
+    }
+  }, [dateRange.startDate, dateRange.endDate]);
 
   // Handle Apply button click
   const handleApplyDateRange = (newDateRange: { startDate: string; endDate: string }) => {
     setDateRange(newDateRange);
-    fetchData(newDateRange.startDate, newDateRange.endDate);
-    // Clear insights and warning when date range changes
-    setInsights(null);
-    setWarning(null);
+    clearInsights();
   };
 
   // Handle Generate Insights button click
   const handleGenerateInsights = () => {
-    fetchInsights();
-  };
-
-  // Handle retry for insights
-  const handleRetryInsights = () => {
-    fetchInsights();
+    generateInsights(dateRange.startDate, dateRange.endDate);
   };
 
   // Handle file upload success
   const handleUploadSuccess = () => {
-    // Reload data after file upload
     fetchData(dateRange.startDate, dateRange.endDate);
   };
 
@@ -287,7 +174,7 @@ export default function Home() {
               loading={loadingInsights}
               error={insightsError}
               onGenerate={handleGenerateInsights}
-              onRetry={handleRetryInsights}
+              onRetry={handleGenerateInsights}
             />
           </>
         )}

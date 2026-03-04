@@ -2,29 +2,12 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getCacheOrBuild } from '@/lib/cache';
 import { buildInsightsPayload } from '@/lib/insights-builder';
 import { generateInsights } from '@/lib/claude-client';
-import { DailyAggregate } from '@/types';
 import { 
   insightsRateLimiter, 
   getClientIp, 
-  validateDateRange,
-  sanitizeErrorMessage 
+  validateDateRange
 } from '@/lib/security';
-
-/**
- * Filter aggregates by date range.
- * 
- * Uses string comparison which works correctly for YYYY-MM-DD format
- * because it's lexicographically sortable.
- */
-function filterByDateRange(
-  aggregates: DailyAggregate[],
-  start: string,
-  end: string
-): DailyAggregate[] {
-  return aggregates.filter((agg) => {
-    return agg.date >= start && agg.date <= end;
-  });
-}
+import { filterByDateRange, handleApiError } from '@/lib/api-utils';
 
 /**
  * POST /api/insights
@@ -166,98 +149,30 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(insights);
     
   } catch (error) {
-    // SECURITY: Sanitize error messages before logging
-    const originalError = (error as Error).message;
-    const sanitizedError = sanitizeErrorMessage(originalError);
-    console.error('Error in POST /api/insights:', sanitizedError);
+    const errorResponse = handleApiError(error, 'POST /api/insights');
     
-    // Handle specific error messages
-    const errorMessage = originalError;
-    
-    // API key not set
-    if (errorMessage.includes('ANTHROPIC_API_KEY')) {
+    // Handle rate limiting specially
+    if (errorResponse.status === 429) {
       return NextResponse.json(
         { 
-          error: 'AI service is not configured properly.',
-          details: 'The AI service configuration is missing. Contact your administrator.'
+          error: errorResponse.error,
+          details: errorResponse.details
         },
-        { status: 500 }
+        { 
+          status: 429,
+          headers: {
+            'Retry-After': '60',
+          }
+        }
       );
     }
     
-    // Claude API timeout or abort
-    if (errorMessage.includes('aborted') || errorMessage.includes('timeout')) {
-      return NextResponse.json(
-        { 
-          error: 'AI service request timed out.',
-          details: 'The request took too long to complete. Please try again with a smaller date range.'
-        },
-        { status: 500 }
-      );
-    }
-    
-    // Claude API failure with retries
-    if (errorMessage.includes('Failed to generate insights after')) {
-      return NextResponse.json(
-        { 
-          error: 'Failed to generate insights after multiple attempts.',
-          details: 'The AI service is currently unavailable. Please try again later.'
-        },
-        { status: 500 }
-      );
-    }
-    
-    // JSON parsing errors
-    if (errorMessage.includes('Failed to parse Claude response')) {
-      return NextResponse.json(
-        { 
-          error: 'Received invalid response from AI service.',
-          details: 'The AI service returned data in an unexpected format. Please try again.'
-        },
-        { status: 500 }
-      );
-    }
-    
-    // Validation errors
-    if (errorMessage.includes('Invalid response structure')) {
-      return NextResponse.json(
-        { 
-          error: 'Received invalid response from AI service.',
-          details: 'The AI service response did not match the expected format. Please try again.'
-        },
-        { status: 500 }
-      );
-    }
-    
-    // Cache/data errors
-    if (errorMessage.includes('CSV file not found')) {
-      return NextResponse.json(
-        { 
-          error: 'Data source not found.',
-          details: 'The data file could not be located. Contact your administrator.'
-        },
-        { status: 500 }
-      );
-    }
-    
-    // Rate limiting (Anthropic API)
-    if (errorMessage.includes('rate_limit') || errorMessage.includes('429')) {
-      return NextResponse.json(
-        { 
-          error: 'AI service rate limit exceeded.',
-          details: 'Too many requests to the AI service. Please wait a moment and try again.'
-        },
-        { status: 429 }
-      );
-    }
-    
-    // Generic error response (sanitized)
     return NextResponse.json(
       { 
-        error: 'An unexpected error occurred while generating insights.',
-        details: 'Please try again later.'
+        error: errorResponse.error,
+        details: errorResponse.details
       },
-      { status: 500 }
+      { status: errorResponse.status }
     );
   }
 }

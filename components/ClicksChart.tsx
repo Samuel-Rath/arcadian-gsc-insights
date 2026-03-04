@@ -1,6 +1,7 @@
 'use client';
 
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { useState } from 'react';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { DailyAggregate } from '@/types';
 
 interface ClicksChartProps {
@@ -11,6 +12,9 @@ interface CustomTooltipProps {
   active?: boolean;
   payload?: Array<{
     payload: DailyAggregate;
+    dataKey: string;
+    value: number;
+    color: string;
   }>;
 }
 
@@ -41,6 +45,13 @@ const CustomTooltip = ({ active, payload }: CustomTooltipProps) => {
 };
 
 export default function ClicksChart({ data }: ClicksChartProps) {
+  const [visibleLines, setVisibleLines] = useState({
+    clicks: true,
+    impressions: false,
+    ctr: false,
+    position: false,
+  });
+
   if (!data || data.length === 0) {
     return (
       <div className="w-full h-64 sm:h-80 lg:h-96 flex flex-col items-center justify-center bg-gradient-to-br from-gray-50 to-blue-50 rounded-lg border-2 border-dashed border-gray-300">
@@ -53,49 +64,147 @@ export default function ClicksChart({ data }: ClicksChartProps) {
     );
   }
 
+  // Normalize data for better visualization
+  const normalizedData = data.map(item => ({
+    ...item,
+    ctrPercent: item.ctr * 100, // Convert to percentage for better scale
+  }));
+
+  const handleLegendClick = (dataKey: string) => {
+    setVisibleLines(prev => ({
+      ...prev,
+      [dataKey]: !prev[dataKey as keyof typeof prev],
+    }));
+  };
+
   return (
-    <div className="w-full h-64 sm:h-80 lg:h-96">
-      <ResponsiveContainer width="100%" height="100%">
-        <LineChart
-          data={data}
-          margin={{ 
-            top: 5, 
-            right: 10, 
-            left: 0, 
-            bottom: 5 
-          }}
+    <div className="w-full">
+      {/* Metric Toggle Buttons */}
+      <div className="flex flex-wrap gap-2 mb-4">
+        <button
+          onClick={() => handleLegendClick('clicks')}
+          className={`px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all duration-200 ${
+            visibleLines.clicks
+              ? 'bg-blue-100 text-blue-700 border-2 border-blue-500'
+              : 'bg-gray-100 text-gray-500 border-2 border-gray-300 hover:bg-gray-200'
+          }`}
         >
-          <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" opacity={0.5} />
-          <XAxis
-            dataKey="date"
-            stroke="#6b7280"
-            style={{ fontSize: '10px' }}
-            tick={{ fill: '#6b7280' }}
-            tickMargin={8}
-          />
-          <YAxis
-            stroke="#6b7280"
-            style={{ fontSize: '10px' }}
-            tick={{ fill: '#6b7280' }}
-            tickMargin={8}
-            label={{ 
-              value: 'Clicks', 
-              angle: -90, 
-              position: 'insideLeft',
-              style: { fontSize: '12px', fill: '#374151' }
+          <span className="inline-block w-3 h-3 rounded-full bg-blue-600 mr-1.5"></span>
+          Clicks
+        </button>
+        <button
+          onClick={() => handleLegendClick('impressions')}
+          className={`px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all duration-200 ${
+            visibleLines.impressions
+              ? 'bg-purple-100 text-purple-700 border-2 border-purple-500'
+              : 'bg-gray-100 text-gray-500 border-2 border-gray-300 hover:bg-gray-200'
+          }`}
+        >
+          <span className="inline-block w-3 h-3 rounded-full bg-purple-600 mr-1.5"></span>
+          Impressions
+        </button>
+        <button
+          onClick={() => handleLegendClick('ctr')}
+          className={`px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all duration-200 ${
+            visibleLines.ctr
+              ? 'bg-green-100 text-green-700 border-2 border-green-500'
+              : 'bg-gray-100 text-gray-500 border-2 border-gray-300 hover:bg-gray-200'
+          }`}
+        >
+          <span className="inline-block w-3 h-3 rounded-full bg-green-600 mr-1.5"></span>
+          CTR %
+        </button>
+        <button
+          onClick={() => handleLegendClick('position')}
+          className={`px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all duration-200 ${
+            visibleLines.position
+              ? 'bg-orange-100 text-orange-700 border-2 border-orange-500'
+              : 'bg-gray-100 text-gray-500 border-2 border-gray-300 hover:bg-gray-200'
+          }`}
+        >
+          <span className="inline-block w-3 h-3 rounded-full bg-orange-600 mr-1.5"></span>
+          Position
+        </button>
+      </div>
+
+      {/* Chart */}
+      <div className="w-full h-64 sm:h-80 lg:h-96">
+        <ResponsiveContainer width="100%" height="100%">
+          <LineChart
+            data={normalizedData}
+            margin={{ 
+              top: 5, 
+              right: 10, 
+              left: 0, 
+              bottom: 5 
             }}
-          />
-          <Tooltip content={<CustomTooltip />} />
-          <Line
-            type="monotone"
-            dataKey="clicks"
-            stroke="#3b82f6"
-            strokeWidth={2.5}
-            dot={{ fill: '#3b82f6', r: 3, strokeWidth: 0 }}
-            activeDot={{ r: 6, strokeWidth: 2, stroke: '#fff' }}
-          />
-        </LineChart>
-      </ResponsiveContainer>
+          >
+            <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" opacity={0.5} />
+            <XAxis
+              dataKey="date"
+              stroke="#6b7280"
+              style={{ fontSize: '10px' }}
+              tick={{ fill: '#6b7280' }}
+              tickMargin={8}
+            />
+            <YAxis
+              stroke="#6b7280"
+              style={{ fontSize: '10px' }}
+              tick={{ fill: '#6b7280' }}
+              tickMargin={8}
+            />
+            <Tooltip content={<CustomTooltip />} />
+            
+            {visibleLines.clicks && (
+              <Line
+                type="monotone"
+                dataKey="clicks"
+                stroke="#3b82f6"
+                strokeWidth={2.5}
+                dot={{ fill: '#3b82f6', r: 3, strokeWidth: 0 }}
+                activeDot={{ r: 6, strokeWidth: 2, stroke: '#fff' }}
+                name="Clicks"
+              />
+            )}
+            
+            {visibleLines.impressions && (
+              <Line
+                type="monotone"
+                dataKey="impressions"
+                stroke="#9333ea"
+                strokeWidth={2.5}
+                dot={{ fill: '#9333ea', r: 3, strokeWidth: 0 }}
+                activeDot={{ r: 6, strokeWidth: 2, stroke: '#fff' }}
+                name="Impressions"
+              />
+            )}
+            
+            {visibleLines.ctr && (
+              <Line
+                type="monotone"
+                dataKey="ctrPercent"
+                stroke="#16a34a"
+                strokeWidth={2.5}
+                dot={{ fill: '#16a34a', r: 3, strokeWidth: 0 }}
+                activeDot={{ r: 6, strokeWidth: 2, stroke: '#fff' }}
+                name="CTR %"
+              />
+            )}
+            
+            {visibleLines.position && (
+              <Line
+                type="monotone"
+                dataKey="position"
+                stroke="#ea580c"
+                strokeWidth={2.5}
+                dot={{ fill: '#ea580c', r: 3, strokeWidth: 0 }}
+                activeDot={{ r: 6, strokeWidth: 2, stroke: '#fff' }}
+                name="Position"
+              />
+            )}
+          </LineChart>
+        </ResponsiveContainer>
+      </div>
     </div>
   );
 }
