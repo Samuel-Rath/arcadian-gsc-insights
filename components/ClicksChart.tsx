@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
+import { useState, useMemo } from 'react';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from 'recharts';
 import { DailyAggregate } from '@/types';
 
 interface ClicksChartProps {
@@ -52,6 +52,33 @@ export default function ClicksChart({ data }: ClicksChartProps) {
     position: false,
   });
 
+  // Calculate statistics for insights
+  const stats = useMemo(() => {
+    if (!data || data.length === 0) return null;
+
+    const clicks = data.map(d => d.clicks);
+    const impressions = data.map(d => d.impressions);
+    const ctrs = data.map(d => d.ctr * 100);
+    const positions = data.map(d => d.position);
+
+    const avg = (arr: number[]) => arr.reduce((a, b) => a + b, 0) / arr.length;
+    const max = (arr: number[]) => Math.max(...arr);
+    const min = (arr: number[]) => Math.min(...arr);
+
+    // Calculate trend (first half vs second half)
+    const midpoint = Math.floor(data.length / 2);
+    const firstHalfClicks = clicks.slice(0, midpoint).reduce((a, b) => a + b, 0);
+    const secondHalfClicks = clicks.slice(midpoint).reduce((a, b) => a + b, 0);
+    const clicksTrend = ((secondHalfClicks - firstHalfClicks) / firstHalfClicks) * 100;
+
+    return {
+      clicks: { avg: avg(clicks), max: max(clicks), min: min(clicks), trend: clicksTrend },
+      impressions: { avg: avg(impressions), max: max(impressions), min: min(impressions) },
+      ctr: { avg: avg(ctrs), max: max(ctrs), min: min(ctrs) },
+      position: { avg: avg(positions), max: max(positions), min: min(positions) },
+    };
+  }, [data]);
+
   if (!data || data.length === 0) {
     return (
       <div className="w-full h-64 sm:h-80 lg:h-96 flex flex-col items-center justify-center bg-gradient-to-br from-gray-50 to-blue-50 rounded-lg border-2 border-dashed border-gray-300">
@@ -67,7 +94,7 @@ export default function ClicksChart({ data }: ClicksChartProps) {
   // Normalize data for better visualization
   const normalizedData = data.map(item => ({
     ...item,
-    ctrPercent: item.ctr * 100, // Convert to percentage for better scale
+    ctrPercent: item.ctr * 100,
   }));
 
   const handleLegendClick = (dataKey: string) => {
@@ -79,13 +106,55 @@ export default function ClicksChart({ data }: ClicksChartProps) {
 
   return (
     <div className="w-full">
+      {/* Quick Stats Bar */}
+      {stats && (
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 mb-4">
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-2">
+            <div className="flex items-center justify-between">
+              <span className="text-xs text-blue-600 font-medium">Clicks Trend</span>
+              {stats.clicks.trend > 0 ? (
+                <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                </svg>
+              ) : (
+                <svg className="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6" />
+                </svg>
+              )}
+            </div>
+            <p className={`text-lg font-bold ${stats.clicks.trend > 0 ? 'text-green-600' : 'text-red-600'}`}>
+              {stats.clicks.trend > 0 ? '+' : ''}{stats.clicks.trend.toFixed(1)}%
+            </p>
+            <p className="text-xs text-gray-600">Avg: {stats.clicks.avg.toFixed(0)}</p>
+          </div>
+
+          <div className="bg-purple-50 border border-purple-200 rounded-lg p-2">
+            <span className="text-xs text-purple-600 font-medium">Impressions</span>
+            <p className="text-lg font-bold text-purple-700">{stats.impressions.avg.toFixed(0)}</p>
+            <p className="text-xs text-gray-600">Range: {stats.impressions.min.toFixed(0)} - {stats.impressions.max.toFixed(0)}</p>
+          </div>
+
+          <div className="bg-green-50 border border-green-200 rounded-lg p-2">
+            <span className="text-xs text-green-600 font-medium">Avg CTR</span>
+            <p className="text-lg font-bold text-green-700">{stats.ctr.avg.toFixed(2)}%</p>
+            <p className="text-xs text-gray-600">Best: {stats.ctr.max.toFixed(2)}%</p>
+          </div>
+
+          <div className="bg-orange-50 border border-orange-200 rounded-lg p-2">
+            <span className="text-xs text-orange-600 font-medium">Avg Position</span>
+            <p className="text-lg font-bold text-orange-700">{stats.position.avg.toFixed(1)}</p>
+            <p className="text-xs text-gray-600">Best: {stats.position.min.toFixed(1)}</p>
+          </div>
+        </div>
+      )}
+
       {/* Metric Toggle Buttons */}
       <div className="flex flex-wrap gap-2 mb-4">
         <button
           onClick={() => handleLegendClick('clicks')}
           className={`px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all duration-200 ${
             visibleLines.clicks
-              ? 'bg-blue-100 text-blue-700 border-2 border-blue-500'
+              ? 'bg-blue-100 text-blue-700 border-2 border-blue-500 shadow-sm'
               : 'bg-gray-100 text-gray-500 border-2 border-gray-300 hover:bg-gray-200'
           }`}
         >
@@ -96,7 +165,7 @@ export default function ClicksChart({ data }: ClicksChartProps) {
           onClick={() => handleLegendClick('impressions')}
           className={`px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all duration-200 ${
             visibleLines.impressions
-              ? 'bg-purple-100 text-purple-700 border-2 border-purple-500'
+              ? 'bg-purple-100 text-purple-700 border-2 border-purple-500 shadow-sm'
               : 'bg-gray-100 text-gray-500 border-2 border-gray-300 hover:bg-gray-200'
           }`}
         >
@@ -107,7 +176,7 @@ export default function ClicksChart({ data }: ClicksChartProps) {
           onClick={() => handleLegendClick('ctr')}
           className={`px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all duration-200 ${
             visibleLines.ctr
-              ? 'bg-green-100 text-green-700 border-2 border-green-500'
+              ? 'bg-green-100 text-green-700 border-2 border-green-500 shadow-sm'
               : 'bg-gray-100 text-gray-500 border-2 border-gray-300 hover:bg-gray-200'
           }`}
         >
@@ -118,7 +187,7 @@ export default function ClicksChart({ data }: ClicksChartProps) {
           onClick={() => handleLegendClick('position')}
           className={`px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all duration-200 ${
             visibleLines.position
-              ? 'bg-orange-100 text-orange-700 border-2 border-orange-500'
+              ? 'bg-orange-100 text-orange-700 border-2 border-orange-500 shadow-sm'
               : 'bg-gray-100 text-gray-500 border-2 border-gray-300 hover:bg-gray-200'
           }`}
         >
@@ -128,14 +197,14 @@ export default function ClicksChart({ data }: ClicksChartProps) {
       </div>
 
       {/* Chart */}
-      <div className="w-full h-64 sm:h-80 lg:h-96">
+      <div className="w-full h-64 sm:h-80 lg:h-96 bg-gradient-to-br from-gray-50 to-white rounded-lg p-2 border border-gray-200">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart
             data={normalizedData}
             margin={{ 
               top: 5, 
               right: 10, 
-              left: 0, 
+              left: 10, 
               bottom: 5 
             }}
           >
@@ -148,6 +217,15 @@ export default function ClicksChart({ data }: ClicksChartProps) {
               tickMargin={8}
             />
             <YAxis
+              yAxisId="left"
+              stroke="#6b7280"
+              style={{ fontSize: '10px' }}
+              tick={{ fill: '#6b7280' }}
+              tickMargin={8}
+            />
+            <YAxis
+              yAxisId="right"
+              orientation="right"
               stroke="#6b7280"
               style={{ fontSize: '10px' }}
               tick={{ fill: '#6b7280' }}
@@ -155,13 +233,26 @@ export default function ClicksChart({ data }: ClicksChartProps) {
             />
             <Tooltip content={<CustomTooltip />} />
             
+            {/* Average reference lines */}
+            {stats && visibleLines.clicks && (
+              <ReferenceLine 
+                yAxisId="left"
+                y={stats.clicks.avg} 
+                stroke="#3b82f6" 
+                strokeDasharray="5 5" 
+                opacity={0.3}
+                label={{ value: 'Avg', position: 'right', fill: '#3b82f6', fontSize: 10 }}
+              />
+            )}
+            
             {visibleLines.clicks && (
               <Line
+                yAxisId="left"
                 type="monotone"
                 dataKey="clicks"
                 stroke="#3b82f6"
                 strokeWidth={2.5}
-                dot={{ fill: '#3b82f6', r: 3, strokeWidth: 0 }}
+                dot={{ fill: '#3b82f6', r: 2, strokeWidth: 0 }}
                 activeDot={{ r: 6, strokeWidth: 2, stroke: '#fff' }}
                 name="Clicks"
               />
@@ -169,11 +260,12 @@ export default function ClicksChart({ data }: ClicksChartProps) {
             
             {visibleLines.impressions && (
               <Line
+                yAxisId="left"
                 type="monotone"
                 dataKey="impressions"
                 stroke="#9333ea"
                 strokeWidth={2.5}
-                dot={{ fill: '#9333ea', r: 3, strokeWidth: 0 }}
+                dot={{ fill: '#9333ea', r: 2, strokeWidth: 0 }}
                 activeDot={{ r: 6, strokeWidth: 2, stroke: '#fff' }}
                 name="Impressions"
               />
@@ -181,11 +273,12 @@ export default function ClicksChart({ data }: ClicksChartProps) {
             
             {visibleLines.ctr && (
               <Line
+                yAxisId="right"
                 type="monotone"
                 dataKey="ctrPercent"
                 stroke="#16a34a"
                 strokeWidth={2.5}
-                dot={{ fill: '#16a34a', r: 3, strokeWidth: 0 }}
+                dot={{ fill: '#16a34a', r: 2, strokeWidth: 0 }}
                 activeDot={{ r: 6, strokeWidth: 2, stroke: '#fff' }}
                 name="CTR %"
               />
@@ -193,11 +286,12 @@ export default function ClicksChart({ data }: ClicksChartProps) {
             
             {visibleLines.position && (
               <Line
+                yAxisId="right"
                 type="monotone"
                 dataKey="position"
                 stroke="#ea580c"
                 strokeWidth={2.5}
-                dot={{ fill: '#ea580c', r: 3, strokeWidth: 0 }}
+                dot={{ fill: '#ea580c', r: 2, strokeWidth: 0 }}
                 activeDot={{ r: 6, strokeWidth: 2, stroke: '#fff' }}
                 name="Position"
               />

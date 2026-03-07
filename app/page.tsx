@@ -6,6 +6,7 @@ import ClicksChart from '@/components/ClicksChart';
 import SummaryStats from '@/components/SummaryStats';
 import InsightsPanel from '@/components/InsightsPanel';
 import FileUpload from '@/components/FileUpload';
+import AnalyticsSummary from '@/components/AnalyticsSummary';
 import { useData } from '@/hooks/useData';
 import { useInsights } from '@/hooks/useInsights';
 import { useDateRange } from '@/hooks/useDateRange';
@@ -137,23 +138,6 @@ export default function Home() {
         {/* Main Content - Only show when not in initial loading */}
         {!isInitialLoad && !error && (
           <>
-            {/* Chart */}
-            <div className="mb-6 bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 p-4 sm:p-6 lg:p-8 border border-gray-100 animate-fadeIn">
-              <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4 sm:mb-6 flex items-center gap-2">
-                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                </svg>
-                Clicks Trend
-              </h2>
-              {loadingData ? (
-                <div className="flex items-center justify-center h-64 sm:h-80 lg:h-96">
-                  <div className="animate-spin rounded-full h-8 w-8 sm:h-10 sm:w-10 border-b-2 border-blue-600"></div>
-                </div>
-              ) : (
-                <ClicksChart data={chartData} />
-              )}
-            </div>
-
             {/* Summary Statistics */}
             {summary && (
               <div className="mb-6">
@@ -167,6 +151,28 @@ export default function Home() {
                 />
               </div>
             )}
+
+            {/* Analytics Summary */}
+            {chartData.length > 0 && (
+              <AnalyticsSummary data={chartData} />
+            )}
+
+            {/* Chart */}
+            <div className="mb-6 bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 p-4 sm:p-6 lg:p-8 border border-gray-100 animate-fadeIn">
+              <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4 sm:mb-6 flex items-center gap-2">
+                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>
+                Performance Trends
+              </h2>
+              {loadingData ? (
+                <div className="flex items-center justify-center h-64 sm:h-80 lg:h-96">
+                  <div className="animate-spin rounded-full h-8 w-8 sm:h-10 sm:w-10 border-b-2 border-blue-600"></div>
+                </div>
+              ) : (
+                <ClicksChart data={chartData} />
+              )}
+            </div>
 
             {/* Insights Panel */}
             <InsightsPanel
