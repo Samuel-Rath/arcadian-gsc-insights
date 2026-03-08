@@ -125,7 +125,7 @@ export default function FileUpload({ onUploadSuccess }: FileUploadProps) {
                   id="file-upload"
                   name="file-upload"
                   type="file"
-                  accept=".csv"
+                  accept=".csv,.pdf"
                   className="sr-only"
                   onChange={handleFileChange}
                   disabled={uploading}
@@ -133,7 +133,7 @@ export default function FileUpload({ onUploadSuccess }: FileUploadProps) {
               </label>
               <p>or drag and drop</p>
             </div>
-            <p className="text-xs text-gray-500 mt-2">CSV files up to 500 MB</p>
+            <p className="text-xs text-gray-500 mt-2">CSV or PDF files up to 500 MB</p>
           </>
         )}
       </div>

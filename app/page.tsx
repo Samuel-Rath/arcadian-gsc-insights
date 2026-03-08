@@ -7,6 +7,7 @@ import SummaryStats from '@/components/SummaryStats';
 import InsightsPanel from '@/components/InsightsPanel';
 import FileUpload from '@/components/FileUpload';
 import AnalyticsSummary from '@/components/AnalyticsSummary';
+import ExportButton from '@/components/ExportButton';
 import { useData } from '@/hooks/useData';
 import { useInsights } from '@/hooks/useInsights';
 import { useDateRange } from '@/hooks/useDateRange';
@@ -62,9 +63,22 @@ export default function Home() {
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-3">
             Arcadian GSC Insights
           </h1>
-          <p className="text-sm sm:text-base lg:text-lg text-gray-600 max-w-2xl mx-auto">
+          <p className="text-sm sm:text-base lg:text-lg text-gray-600 max-w-2xl mx-auto mb-4">
             Analyze your Google Search Console data with AI-powered insights
           </p>
+          
+          {/* Export Button */}
+          {!isInitialLoad && !error && summary && (
+            <div className="flex justify-center">
+              <ExportButton
+                dateRange={dateRange}
+                summary={summary}
+                chartData={chartData}
+                insights={insights}
+                chartElementId="performance-chart"
+              />
+            </div>
+          )}
         </header>
 
         {/* Date Range Picker */}
@@ -158,7 +172,7 @@ export default function Home() {
             )}
 
             {/* Chart */}
-            <div className="mb-6 bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 p-4 sm:p-6 lg:p-8 border border-gray-100 animate-fadeIn">
+            <div id="performance-chart" className="mb-6 bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 p-4 sm:p-6 lg:p-8 border border-gray-100 animate-fadeIn">
               <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4 sm:mb-6 flex items-center gap-2">
                 <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />

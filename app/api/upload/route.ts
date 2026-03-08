@@ -32,9 +32,9 @@ export async function POST(request: NextRequest) {
     }
 
     // Validate file type
-    if (!file.name.endsWith('.csv')) {
+    if (!file.name.endsWith('.csv') && !file.name.endsWith('.pdf')) {
       return NextResponse.json(
-        { error: 'Invalid file type. Please upload a CSV file.' },
+        { error: 'Invalid file type. Please upload a CSV or PDF file.' },
         { status: 400 }
       );
     }
@@ -52,20 +52,29 @@ export async function POST(request: NextRequest) {
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    // Determine save path
-    let csvPath = process.env.CSV_FILE_PATH;
+    // Determine save path based on file type
+    let savePath: string;
     
-    if (!csvPath) {
-      // Default to project directory on Windows
-      csvPath = join(process.cwd(), 'uploaded-data', 'arckeywords.csv');
+    if (file.name.endsWith('.csv')) {
+      let csvPath = process.env.CSV_FILE_PATH;
+      
+      if (!csvPath) {
+        csvPath = join(process.cwd(), 'uploaded-data', 'arckeywords.csv');
+      }
+      
+      savePath = csvPath;
+    } else {
+      // PDF file
+      const pdfPath = join(process.cwd(), 'uploaded-data', 'report.pdf');
+      savePath = pdfPath;
     }
     
     // Ensure directory exists
-    const dir = join(csvPath, '..');
+    const dir = join(savePath, '..');
     await fs.mkdir(dir, { recursive: true });
 
     // Save file
-    await fs.writeFile(csvPath, buffer);
+    await fs.writeFile(savePath, buffer);
 
     // Clear cache to force rebuild with new data
     const cachePath = join(process.cwd(), '.data-cache', 'daily-aggregates.json');
@@ -80,7 +89,8 @@ export async function POST(request: NextRequest) {
       message: 'File uploaded successfully',
       filename: file.name,
       size: file.size,
-      path: csvPath,
+      path: savePath,
+      type: file.name.endsWith('.csv') ? 'csv' : 'pdf',
     });
 
   } catch (error) {
