@@ -161,19 +161,44 @@ await exportChartToPDF(chartElement, {
 
 ### Accepted File Types
 The file upload component now accepts both CSV and PDF files:
-- `.csv` - Google Search Console data
-- `.pdf` - Previously exported reports (for reference)
+- `.csv` - Google Search Console data (direct upload)
+- `.pdf` - Google Search Console PDF exports (automatically converted to CSV)
+
+### PDF Processing
+When a PDF is uploaded:
+1. **Validation**: Checks if file is a valid PDF format
+2. **Parsing**: Extracts GSC data using pattern matching
+3. **Conversion**: Converts extracted data to CSV format
+4. **Storage**: Saves as CSV for processing
+5. **Feedback**: Shows "PDF converted to CSV" message
+
+### Supported PDF Formats
+The parser supports PDFs containing:
+- Date columns (YYYY-MM-DD format)
+- Query/keyword data
+- Clicks, impressions, CTR, and position metrics
+- Table-structured data
+- Google Search Console export formats
+
+### PDF Data Patterns
+The parser recognizes these patterns:
+```
+2024-01-01 keyword 100 1000 10.0% 5.5
+Date       Query   Clicks Impressions CTR Position
+```
 
 ### File Validation
 - Maximum size: 500 MB
 - Accepted extensions: `.csv`, `.pdf`
-- Type validation on both client and server
+- PDF format validation (checks for %PDF- header)
+- Data extraction validation
 
 ### Storage
 - CSV files: `uploaded-data/arckeywords.csv`
-- PDF files: `uploaded-data/report.pdf`
+- PDF files: Converted to CSV and stored as `uploaded-data/arckeywords.csv`
 - Automatic directory creation
 - Overwrites existing files
+- Cache cleared after upload
 
 ## Error Handling
 

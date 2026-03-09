@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { promises as fs } from 'fs';
 import { join } from 'path';
+import { parsePDFToCSV, isPDF } from '@/lib/pdf-parser';
 
 /**
  * POST /api/upload
@@ -52,10 +53,45 @@ export async function POST(request: NextRequest) {
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    // Determine save path based on file type
+    // Determine save path and handle PDF conversion
     let savePath: string;
+    let finalBuffer: Buffer = buffer;
+    let fileType: string;
     
-    if (file.name.endsWith('.csv')) {
+    if (file.name.endsWith('.pdf')) {
+      // Validate PDF
+      if (!isPDF(buffer)) {
+        return NextResponse.json(
+          { error: 'Invalid PDF file format.' },
+          { status: 400 }
+        );
+      }
+
+      try {
+        // Parse PDF to CSV
+        const csvContent = await parsePDFToCSV(buffer);
+        finalBuffer = Buffer.from(csvContent, 'utf-8');
+        fileType = 'pdf-converted';
+        
+        // Save as CSV
+        let csvPath = process.env.CSV_FILE_PATH;
+        if (!csvPath) {
+          csvPath = join(process.cwd(), 'uploaded-data', 'arckeywords.csv');
+        }
+        savePath = csvPath;
+      } catch (error) {
+        console.error('PDF parsing error:', error);
+        return NextResponse.json(
+          { 
+            error: 'Failed to parse PDF file.',
+            details: error instanceof Error ? error.message : 'The PDF format is not supported or does not contain valid GSC data.'
+          },
+          { status: 400 }
+        );
+      }
+    } else {
+      // CSV file
+      fileType = 'csv';
       let csvPath = process.env.CSV_FILE_PATH;
       
       if (!csvPath) {
@@ -63,10 +99,6 @@ export async function POST(request: NextRequest) {
       }
       
       savePath = csvPath;
-    } else {
-      // PDF file
-      const pdfPath = join(process.cwd(), 'uploaded-data', 'report.pdf');
-      savePath = pdfPath;
     }
     
     // Ensure directory exists
@@ -74,7 +106,7 @@ export async function POST(request: NextRequest) {
     await fs.mkdir(dir, { recursive: true });
 
     // Save file
-    await fs.writeFile(savePath, buffer);
+    await fs.writeFile(savePath, finalBuffer);
 
     // Clear cache to force rebuild with new data
     const cachePath = join(process.cwd(), '.data-cache', 'daily-aggregates.json');
@@ -86,11 +118,13 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: 'File uploaded successfully',
+      message: fileType === 'pdf-converted' 
+        ? 'PDF file uploaded and converted to CSV successfully' 
+        : 'File uploaded successfully',
       filename: file.name,
       size: file.size,
       path: savePath,
-      type: file.name.endsWith('.csv') ? 'csv' : 'pdf',
+      type: fileType,
     });
 
   } catch (error) {

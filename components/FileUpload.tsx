@@ -32,7 +32,7 @@ export default function FileUpload({ onUploadSuccess }: FileUploadProps) {
         throw new Error(data.error || 'Upload failed');
       }
 
-      setSuccess(`File uploaded successfully! (${(file.size / 1024 / 1024).toFixed(2)} MB)`);
+      setSuccess(`File uploaded successfully! (${(file.size / 1024 / 1024).toFixed(2)} MB)${data.type === 'pdf-converted' ? ' - PDF converted to CSV' : ''}`);
       
       // Wait a moment then trigger data reload
       setTimeout(() => {
