@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useCallback } from 'react';
 import { DailyAggregate } from '@/types';
+import { clientCache } from '@/lib/client-cache';
 
 interface Summary {
   totalClicks: number;
@@ -22,7 +23,7 @@ interface UseDataReturn {
 
 /**
  * Custom hook for managing data fetching and state.
- * Handles loading, error states, and data caching.
+ * Handles loading, error states, and client-side caching.
  */
 export function useData(): UseDataReturn {
   const [chartData, setChartData] = useState<DailyAggregate[]>([]);
@@ -32,7 +33,22 @@ export function useData(): UseDataReturn {
   const [warning, setWarning] = useState<string | null>(null);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
 
-  const fetchData = async (start: string, end: string) => {
+  const fetchData = useCallback(async (start: string, end: string) => {
+    // Check cache first
+    const cacheKey = `data-${start}-${end}`;
+    const cached = clientCache.get<{ series: DailyAggregate[]; summary: Summary; warning?: string }>(cacheKey);
+
+    if (cached) {
+      setChartData(cached.series);
+      setSummary(cached.summary);
+      if (cached.warning) {
+        setWarning(cached.warning);
+      }
+      setLoading(false);
+      setIsInitialLoad(false);
+      return;
+    }
+
     setLoading(true);
     setError(null);
     setWarning(null);
@@ -46,6 +62,10 @@ export function useData(): UseDataReturn {
       }
 
       const data = await response.json();
+      
+      // Cache the response
+      clientCache.set(cacheKey, data, 10 * 60 * 1000); // 10 minutes
+      
       setChartData(data.series);
       setSummary(data.summary);
       
@@ -69,7 +89,7 @@ export function useData(): UseDataReturn {
       setLoading(false);
       setIsInitialLoad(false);
     }
-  };
+  }, []);
 
   return {
     chartData,

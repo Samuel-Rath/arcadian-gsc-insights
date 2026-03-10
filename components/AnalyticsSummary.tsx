@@ -1,13 +1,13 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, memo } from 'react';
 import { DailyAggregate } from '@/types';
 
 interface AnalyticsSummaryProps {
   data: DailyAggregate[];
 }
 
-export default function AnalyticsSummary({ data }: AnalyticsSummaryProps) {
+const AnalyticsSummary = memo(({ data }: AnalyticsSummaryProps) => {
   const insights = useMemo(() => {
     if (!data || data.length === 0) return null;
 
@@ -180,4 +180,8 @@ export default function AnalyticsSummary({ data }: AnalyticsSummaryProps) {
       </div>
     </div>
   );
-}
+});
+
+AnalyticsSummary.displayName = 'AnalyticsSummary';
+
+export default AnalyticsSummary;

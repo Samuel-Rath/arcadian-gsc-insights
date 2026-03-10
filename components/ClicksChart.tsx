@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, memo } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from 'recharts';
 import { DailyAggregate } from '@/types';
 
@@ -18,7 +18,7 @@ interface CustomTooltipProps {
   }>;
 }
 
-const CustomTooltip = ({ active, payload }: CustomTooltipProps) => {
+const CustomTooltip = memo(({ active, payload }: CustomTooltipProps) => {
   if (active && payload && payload.length) {
     const data = payload[0].payload;
     return (
@@ -42,9 +42,11 @@ const CustomTooltip = ({ active, payload }: CustomTooltipProps) => {
     );
   }
   return null;
-};
+});
 
-export default function ClicksChart({ data }: ClicksChartProps) {
+CustomTooltip.displayName = 'CustomTooltip';
+
+const ClicksChart = memo(({ data }: ClicksChartProps) => {
   const [visibleLines, setVisibleLines] = useState({
     clicks: true,
     impressions: false,
@@ -301,4 +303,8 @@ export default function ClicksChart({ data }: ClicksChartProps) {
       </div>
     </div>
   );
-}
+});
+
+ClicksChart.displayName = 'ClicksChart';
+
+export default ClicksChart;

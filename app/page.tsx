@@ -1,16 +1,25 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, lazy, Suspense, useCallback } from 'react';
 import DateRangePicker from '@/components/DateRangePicker';
-import ClicksChart from '@/components/ClicksChart';
 import SummaryStats from '@/components/SummaryStats';
-import InsightsPanel from '@/components/InsightsPanel';
 import FileUpload from '@/components/FileUpload';
-import AnalyticsSummary from '@/components/AnalyticsSummary';
-import ExportButton from '@/components/ExportButton';
 import { useData } from '@/hooks/useData';
 import { useInsights } from '@/hooks/useInsights';
 import { useDateRange } from '@/hooks/useDateRange';
+
+// Lazy load heavy components
+const ClicksChart = lazy(() => import('@/components/ClicksChart'));
+const AnalyticsSummary = lazy(() => import('@/components/AnalyticsSummary'));
+const InsightsPanel = lazy(() => import('@/components/InsightsPanel'));
+const ExportButton = lazy(() => import('@/components/ExportButton'));
+
+// Loading fallback component
+const ComponentLoader = () => (
+  <div className="flex items-center justify-center h-32">
+    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+  </div>
+);
 
 export default function Home() {
   // Custom hooks for state management
@@ -37,23 +46,23 @@ export default function Home() {
     if (dateRange.startDate && dateRange.endDate) {
       fetchData(dateRange.startDate, dateRange.endDate);
     }
-  }, [dateRange.startDate, dateRange.endDate]);
+  }, [dateRange.startDate, dateRange.endDate, fetchData]);
 
   // Handle Apply button click
-  const handleApplyDateRange = (newDateRange: { startDate: string; endDate: string }) => {
+  const handleApplyDateRange = useCallback((newDateRange: { startDate: string; endDate: string }) => {
     setDateRange(newDateRange);
     clearInsights();
-  };
+  }, [setDateRange, clearInsights]);
 
   // Handle Generate Insights button click
-  const handleGenerateInsights = () => {
+  const handleGenerateInsights = useCallback(() => {
     generateInsights(dateRange.startDate, dateRange.endDate);
-  };
+  }, [generateInsights, dateRange.startDate, dateRange.endDate]);
 
   // Handle file upload success
-  const handleUploadSuccess = () => {
+  const handleUploadSuccess = useCallback(() => {
     fetchData(dateRange.startDate, dateRange.endDate);
-  };
+  }, [fetchData, dateRange.startDate, dateRange.endDate]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-gray-50">
@@ -70,13 +79,15 @@ export default function Home() {
           {/* Export Button */}
           {!isInitialLoad && !error && summary && (
             <div className="flex justify-center">
-              <ExportButton
-                dateRange={dateRange}
-                summary={summary}
-                chartData={chartData}
-                insights={insights}
-                chartElementId="performance-chart"
-              />
+              <Suspense fallback={<ComponentLoader />}>
+                <ExportButton
+                  dateRange={dateRange}
+                  summary={summary}
+                  chartData={chartData}
+                  insights={insights}
+                  chartElementId="performance-chart"
+                />
+              </Suspense>
             </div>
           )}
         </header>
@@ -168,7 +179,9 @@ export default function Home() {
 
             {/* Analytics Summary */}
             {chartData.length > 0 && (
-              <AnalyticsSummary data={chartData} />
+              <Suspense fallback={<ComponentLoader />}>
+                <AnalyticsSummary data={chartData} />
+              </Suspense>
             )}
 
             {/* Chart */}
@@ -184,18 +197,22 @@ export default function Home() {
                   <div className="animate-spin rounded-full h-8 w-8 sm:h-10 sm:w-10 border-b-2 border-blue-600"></div>
                 </div>
               ) : (
-                <ClicksChart data={chartData} />
+                <Suspense fallback={<ComponentLoader />}>
+                  <ClicksChart data={chartData} />
+                </Suspense>
               )}
             </div>
 
             {/* Insights Panel */}
-            <InsightsPanel
-              insights={insights}
-              loading={loadingInsights}
-              error={insightsError}
-              onGenerate={handleGenerateInsights}
-              onRetry={handleGenerateInsights}
-            />
+            <Suspense fallback={<ComponentLoader />}>
+              <InsightsPanel
+                insights={insights}
+                loading={loadingInsights}
+                error={insightsError}
+                onGenerate={handleGenerateInsights}
+                onRetry={handleGenerateInsights}
+              />
+            </Suspense>
           </>
         )}
       </div>
