@@ -22,21 +22,13 @@ const CustomTooltip = memo(({ active, payload }: CustomTooltipProps) => {
   if (active && payload && payload.length) {
     const data = payload[0].payload;
     return (
-      <div className="bg-white p-3 sm:p-4 border-2 border-blue-200 rounded-lg shadow-xl">
-        <p className="font-bold text-gray-900 mb-2 text-sm sm:text-base">{data.date}</p>
+      <div className="bg-white p-3 sm:p-4 border border-slate-200 rounded-lg shadow-lg">
+        <p className="font-semibold text-slate-800 mb-2 text-sm">{data.date}</p>
         <div className="space-y-1">
-          <p className="text-xs sm:text-sm text-gray-700">
-            <span className="font-semibold text-blue-600">Clicks:</span> {data.clicks.toLocaleString()}
-          </p>
-          <p className="text-xs sm:text-sm text-gray-700">
-            <span className="font-semibold text-purple-600">Impressions:</span> {data.impressions.toLocaleString()}
-          </p>
-          <p className="text-xs sm:text-sm text-gray-700">
-            <span className="font-semibold text-green-600">CTR:</span> {(data.ctr * 100).toFixed(2)}%
-          </p>
-          <p className="text-xs sm:text-sm text-gray-700">
-            <span className="font-semibold text-orange-600">Position:</span> {data.position.toFixed(1)}
-          </p>
+          <p className="text-xs text-slate-600"><span className="font-medium text-indigo-600">Clicks:</span> {data.clicks.toLocaleString()}</p>
+          <p className="text-xs text-slate-600"><span className="font-medium text-slate-500">Impressions:</span> {data.impressions.toLocaleString()}</p>
+          <p className="text-xs text-slate-600"><span className="font-medium text-emerald-600">CTR:</span> {(data.ctr * 100).toFixed(2)}%</p>
+          <p className="text-xs text-slate-600"><span className="font-medium text-amber-600">Position:</span> {data.position.toFixed(1)}</p>
         </div>
       </div>
     );
@@ -111,192 +103,91 @@ const ClicksChart = memo(({ data }: ClicksChartProps) => {
       {/* Quick Stats Bar */}
       {stats && (
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 mb-4">
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-2">
+          <div className="bg-slate-50 border border-slate-200 rounded-lg p-2">
             <div className="flex items-center justify-between">
-              <span className="text-xs text-blue-600 font-medium">Clicks Trend</span>
-              {stats.clicks.trend > 0 ? (
-                <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-                </svg>
-              ) : (
-                <svg className="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6" />
-                </svg>
-              )}
+              <span className="text-xs text-slate-500 font-medium">Clicks Trend</span>
+              <span className={`text-xs font-semibold ${stats.clicks.trend > 0 ? 'text-emerald-600' : 'text-red-500'}`}>
+                {stats.clicks.trend > 0 ? '↑' : '↓'}
+              </span>
             </div>
-            <p className={`text-lg font-bold ${stats.clicks.trend > 0 ? 'text-green-600' : 'text-red-600'}`}>
+            <p className={`text-lg font-bold ${stats.clicks.trend > 0 ? 'text-emerald-600' : 'text-red-500'}`}>
               {stats.clicks.trend > 0 ? '+' : ''}{stats.clicks.trend.toFixed(1)}%
             </p>
-            <p className="text-xs text-gray-600">Avg: {stats.clicks.avg.toFixed(0)}</p>
+            <p className="text-xs text-slate-400">Avg: {stats.clicks.avg.toFixed(0)}</p>
           </div>
 
-          <div className="bg-purple-50 border border-purple-200 rounded-lg p-2">
-            <span className="text-xs text-purple-600 font-medium">Impressions</span>
-            <p className="text-lg font-bold text-purple-700">{stats.impressions.avg.toFixed(0)}</p>
-            <p className="text-xs text-gray-600">Range: {stats.impressions.min.toFixed(0)} - {stats.impressions.max.toFixed(0)}</p>
+          <div className="bg-slate-50 border border-slate-200 rounded-lg p-2">
+            <span className="text-xs text-slate-500 font-medium">Impressions</span>
+            <p className="text-lg font-bold text-slate-700">{stats.impressions.avg.toFixed(0)}</p>
+            <p className="text-xs text-slate-400">Range: {stats.impressions.min.toFixed(0)} – {stats.impressions.max.toFixed(0)}</p>
           </div>
 
-          <div className="bg-green-50 border border-green-200 rounded-lg p-2">
-            <span className="text-xs text-green-600 font-medium">Avg CTR</span>
-            <p className="text-lg font-bold text-green-700">{stats.ctr.avg.toFixed(2)}%</p>
-            <p className="text-xs text-gray-600">Best: {stats.ctr.max.toFixed(2)}%</p>
+          <div className="bg-slate-50 border border-slate-200 rounded-lg p-2">
+            <span className="text-xs text-slate-500 font-medium">Avg CTR</span>
+            <p className="text-lg font-bold text-slate-700">{stats.ctr.avg.toFixed(2)}%</p>
+            <p className="text-xs text-slate-400">Best: {stats.ctr.max.toFixed(2)}%</p>
           </div>
 
-          <div className="bg-orange-50 border border-orange-200 rounded-lg p-2">
-            <span className="text-xs text-orange-600 font-medium">Avg Position</span>
-            <p className="text-lg font-bold text-orange-700">{stats.position.avg.toFixed(1)}</p>
-            <p className="text-xs text-gray-600">Best: {stats.position.min.toFixed(1)}</p>
+          <div className="bg-slate-50 border border-slate-200 rounded-lg p-2">
+            <span className="text-xs text-slate-500 font-medium">Avg Position</span>
+            <p className="text-lg font-bold text-slate-700">{stats.position.avg.toFixed(1)}</p>
+            <p className="text-xs text-slate-400">Best: {stats.position.min.toFixed(1)}</p>
           </div>
         </div>
       )}
 
       {/* Metric Toggle Buttons */}
       <div className="flex flex-wrap gap-2 mb-4">
-        <button
-          onClick={() => handleLegendClick('clicks')}
-          className={`px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all duration-200 ${
-            visibleLines.clicks
-              ? 'bg-blue-100 text-blue-700 border-2 border-blue-500 shadow-sm'
-              : 'bg-gray-100 text-gray-500 border-2 border-gray-300 hover:bg-gray-200'
-          }`}
-        >
-          <span className="inline-block w-3 h-3 rounded-full bg-blue-600 mr-1.5"></span>
-          Clicks
-        </button>
-        <button
-          onClick={() => handleLegendClick('impressions')}
-          className={`px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all duration-200 ${
-            visibleLines.impressions
-              ? 'bg-purple-100 text-purple-700 border-2 border-purple-500 shadow-sm'
-              : 'bg-gray-100 text-gray-500 border-2 border-gray-300 hover:bg-gray-200'
-          }`}
-        >
-          <span className="inline-block w-3 h-3 rounded-full bg-purple-600 mr-1.5"></span>
-          Impressions
-        </button>
-        <button
-          onClick={() => handleLegendClick('ctr')}
-          className={`px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all duration-200 ${
-            visibleLines.ctr
-              ? 'bg-green-100 text-green-700 border-2 border-green-500 shadow-sm'
-              : 'bg-gray-100 text-gray-500 border-2 border-gray-300 hover:bg-gray-200'
-          }`}
-        >
-          <span className="inline-block w-3 h-3 rounded-full bg-green-600 mr-1.5"></span>
-          CTR %
-        </button>
-        <button
-          onClick={() => handleLegendClick('position')}
-          className={`px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all duration-200 ${
-            visibleLines.position
-              ? 'bg-orange-100 text-orange-700 border-2 border-orange-500 shadow-sm'
-              : 'bg-gray-100 text-gray-500 border-2 border-gray-300 hover:bg-gray-200'
-          }`}
-        >
-          <span className="inline-block w-3 h-3 rounded-full bg-orange-600 mr-1.5"></span>
-          Position
-        </button>
+        {[
+          { key: 'clicks', label: 'Clicks', color: 'bg-indigo-500' },
+          { key: 'impressions', label: 'Impressions', color: 'bg-slate-400' },
+          { key: 'ctr', label: 'CTR %', color: 'bg-emerald-500' },
+          { key: 'position', label: 'Position', color: 'bg-amber-500' },
+        ].map(({ key, label, color }) => (
+          <button
+            key={key}
+            onClick={() => handleLegendClick(key)}
+            className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all duration-150 flex items-center gap-1.5 border ${
+              visibleLines[key as keyof typeof visibleLines]
+                ? 'bg-slate-900 text-white border-slate-900'
+                : 'bg-white text-slate-500 border-slate-200 hover:border-slate-300 hover:text-slate-700'
+            }`}
+          >
+            <span className={`inline-block w-2 h-2 rounded-full ${color}`}></span>
+            {label}
+          </button>
+        ))}
       </div>
 
       {/* Chart */}
-      <div className="w-full h-64 sm:h-80 lg:h-96 bg-gradient-to-br from-gray-50 to-white rounded-lg p-2 border border-gray-200">
+      <div className="w-full h-64 sm:h-80 lg:h-96 bg-white rounded-lg p-2 border border-slate-200">
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart
-            data={normalizedData}
-            margin={{ 
-              top: 5, 
-              right: 10, 
-              left: 10, 
-              bottom: 5 
-            }}
-          >
-            <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" opacity={0.5} />
-            <XAxis
-              dataKey="date"
-              stroke="#6b7280"
-              style={{ fontSize: '10px' }}
-              tick={{ fill: '#6b7280' }}
-              tickMargin={8}
-            />
-            <YAxis
-              yAxisId="left"
-              stroke="#6b7280"
-              style={{ fontSize: '10px' }}
-              tick={{ fill: '#6b7280' }}
-              tickMargin={8}
-            />
-            <YAxis
-              yAxisId="right"
-              orientation="right"
-              stroke="#6b7280"
-              style={{ fontSize: '10px' }}
-              tick={{ fill: '#6b7280' }}
-              tickMargin={8}
-            />
+          <LineChart data={normalizedData} margin={{ top: 5, right: 10, left: 10, bottom: 5 }}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" opacity={0.8} />
+            <XAxis dataKey="date" stroke="#94a3b8" style={{ fontSize: '10px' }} tick={{ fill: '#94a3b8' }} tickMargin={8} />
+            <YAxis yAxisId="left" stroke="#94a3b8" style={{ fontSize: '10px' }} tick={{ fill: '#94a3b8' }} tickMargin={8} />
+            <YAxis yAxisId="right" orientation="right" stroke="#94a3b8" style={{ fontSize: '10px' }} tick={{ fill: '#94a3b8' }} tickMargin={8} />
             <Tooltip content={<CustomTooltip />} />
-            
-            {/* Average reference lines */}
+
             {stats && visibleLines.clicks && (
-              <ReferenceLine 
-                yAxisId="left"
-                y={stats.clicks.avg} 
-                stroke="#3b82f6" 
-                strokeDasharray="5 5" 
-                opacity={0.3}
-                label={{ value: 'Avg', position: 'right', fill: '#3b82f6', fontSize: 10 }}
-              />
+              <ReferenceLine yAxisId="left" y={stats.clicks.avg} stroke="#6366f1" strokeDasharray="5 5" opacity={0.4}
+                label={{ value: 'Avg', position: 'right', fill: '#6366f1', fontSize: 10 }} />
             )}
-            
             {visibleLines.clicks && (
-              <Line
-                yAxisId="left"
-                type="monotone"
-                dataKey="clicks"
-                stroke="#3b82f6"
-                strokeWidth={2.5}
-                dot={{ fill: '#3b82f6', r: 2, strokeWidth: 0 }}
-                activeDot={{ r: 6, strokeWidth: 2, stroke: '#fff' }}
-                name="Clicks"
-              />
+              <Line yAxisId="left" type="monotone" dataKey="clicks" stroke="#6366f1" strokeWidth={2}
+                dot={{ fill: '#6366f1', r: 2, strokeWidth: 0 }} activeDot={{ r: 5, strokeWidth: 2, stroke: '#fff' }} name="Clicks" />
             )}
-            
             {visibleLines.impressions && (
-              <Line
-                yAxisId="left"
-                type="monotone"
-                dataKey="impressions"
-                stroke="#9333ea"
-                strokeWidth={2.5}
-                dot={{ fill: '#9333ea', r: 2, strokeWidth: 0 }}
-                activeDot={{ r: 6, strokeWidth: 2, stroke: '#fff' }}
-                name="Impressions"
-              />
+              <Line yAxisId="left" type="monotone" dataKey="impressions" stroke="#94a3b8" strokeWidth={2}
+                dot={{ fill: '#94a3b8', r: 2, strokeWidth: 0 }} activeDot={{ r: 5, strokeWidth: 2, stroke: '#fff' }} name="Impressions" />
             )}
-            
             {visibleLines.ctr && (
-              <Line
-                yAxisId="right"
-                type="monotone"
-                dataKey="ctrPercent"
-                stroke="#16a34a"
-                strokeWidth={2.5}
-                dot={{ fill: '#16a34a', r: 2, strokeWidth: 0 }}
-                activeDot={{ r: 6, strokeWidth: 2, stroke: '#fff' }}
-                name="CTR %"
-              />
+              <Line yAxisId="right" type="monotone" dataKey="ctrPercent" stroke="#10b981" strokeWidth={2}
+                dot={{ fill: '#10b981', r: 2, strokeWidth: 0 }} activeDot={{ r: 5, strokeWidth: 2, stroke: '#fff' }} name="CTR %" />
             )}
-            
             {visibleLines.position && (
-              <Line
-                yAxisId="right"
-                type="monotone"
-                dataKey="position"
-                stroke="#ea580c"
-                strokeWidth={2.5}
-                dot={{ fill: '#ea580c', r: 2, strokeWidth: 0 }}
-                activeDot={{ r: 6, strokeWidth: 2, stroke: '#fff' }}
-                name="Position"
-              />
+              <Line yAxisId="right" type="monotone" dataKey="position" stroke="#f59e0b" strokeWidth={2}
+                dot={{ fill: '#f59e0b', r: 2, strokeWidth: 0 }} activeDot={{ r: 5, strokeWidth: 2, stroke: '#fff' }} name="Position" />
             )}
           </LineChart>
         </ResponsiveContainer>

@@ -75,19 +75,17 @@ export default function FileUpload({ onUploadSuccess }: FileUploadProps) {
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300 p-4 sm:p-6 mb-6 border border-gray-100">
-      <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4 flex items-center gap-2">
-        <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4 sm:p-6 mb-6">
+      <h2 className="text-sm font-semibold text-slate-700 mb-4 flex items-center gap-2 uppercase tracking-wide">
+        <svg className="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
         </svg>
-        Upload CSV File
+        Upload Data
       </h2>
 
       <div
         className={`border-2 border-dashed rounded-lg p-6 sm:p-8 text-center transition-colors ${
-          dragActive
-            ? 'border-blue-500 bg-blue-50'
-            : 'border-gray-300 hover:border-gray-400'
+          dragActive ? 'border-indigo-400 bg-indigo-50' : 'border-slate-200 hover:border-slate-300 bg-slate-50'
         }`}
         onDragEnter={handleDrag}
         onDragLeave={handleDrag}
@@ -96,31 +94,18 @@ export default function FileUpload({ onUploadSuccess }: FileUploadProps) {
       >
         {uploading ? (
           <div className="flex flex-col items-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
-            <p className="text-gray-600">Uploading file...</p>
+            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-600 mb-4"></div>
+            <p className="text-slate-500 text-sm">Uploading file...</p>
           </div>
         ) : (
           <>
-            <svg
-              className="mx-auto h-12 w-12 text-gray-400 mb-4"
-              stroke="currentColor"
-              fill="none"
-              viewBox="0 0 48 48"
-              aria-hidden="true"
-            >
-              <path
-                d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
-                strokeWidth={2}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
+            <svg className="mx-auto h-10 w-10 text-slate-300 mb-3" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
+              <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
+                strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
             </svg>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-2 text-sm text-gray-600">
-              <label
-                htmlFor="file-upload"
-                className="relative cursor-pointer rounded-md font-medium text-blue-600 hover:text-blue-700 focus-within:outline-none transition-colors duration-200"
-              >
-                <span className="underline decoration-2 decoration-blue-400 hover:decoration-blue-600">Upload a file</span>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-2 text-sm text-slate-500">
+              <label htmlFor="file-upload" className="relative cursor-pointer font-medium text-indigo-600 hover:text-indigo-700 focus-within:outline-none transition-colors duration-150">
+                <span>Upload a file</span>
                 <input
                   id="file-upload"
                   name="file-upload"
@@ -133,7 +118,7 @@ export default function FileUpload({ onUploadSuccess }: FileUploadProps) {
               </label>
               <p>or drag and drop</p>
             </div>
-            <p className="text-xs text-gray-500 mt-2">CSV or PDF files up to 500 MB</p>
+            <p className="text-xs text-slate-400 mt-2">CSV or PDF up to 500 MB</p>
           </>
         )}
       </div>

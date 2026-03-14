@@ -17,7 +17,7 @@ const ExportButton = lazy(() => import('@/components/ExportButton'));
 // Loading fallback component
 const ComponentLoader = () => (
   <div className="flex items-center justify-center h-32">
-    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
   </div>
 );
 
@@ -65,54 +65,47 @@ export default function Home() {
   }, [fetchData, dateRange.startDate, dateRange.endDate]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 relative overflow-hidden">
-      {/* Animated background elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-float"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-float" style={{ animationDelay: '2s' }}></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-pink-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-float" style={{ animationDelay: '4s' }}></div>
-      </div>
-      
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-12 relative z-10">
+    <div className="min-h-screen bg-slate-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-12">
         {/* Header */}
-        <header className="mb-6 sm:mb-8 lg:mb-10 text-center">
-          <div className="inline-block mb-4 px-4 py-2 bg-gradient-to-r from-blue-100 to-purple-100 rounded-full">
-            <span className="text-xs sm:text-sm font-semibold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              ✨ AI-Powered Analytics
-            </span>
-          </div>
-          <h1 className="text-3xl sm:text-4xl lg:text-6xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent mb-3 animate-fadeIn">
-            Arcadian GSC Insights
-          </h1>
-          <p className="text-sm sm:text-base lg:text-lg text-gray-600 max-w-2xl mx-auto mb-4 animate-fadeIn" style={{ animationDelay: '0.1s' }}>
-            Transform your Google Search Console data into actionable insights
-          </p>
-          
-          {/* Export Button */}
-          {!isInitialLoad && !error && summary && (
-            <div className="flex justify-center">
-              <Suspense fallback={<ComponentLoader />}>
-                <ExportButton
-                  dateRange={dateRange}
-                  summary={summary}
-                  chartData={chartData}
-                  insights={insights}
-                  chartElementId="performance-chart"
-                />
-              </Suspense>
+        <header className="mb-8 sm:mb-10">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+              <div className="inline-flex items-center gap-2 mb-3 px-3 py-1 bg-indigo-50 border border-indigo-100 rounded-full">
+                <div className="w-1.5 h-1.5 rounded-full bg-indigo-500"></div>
+                <span className="text-xs font-semibold text-indigo-700 tracking-wide uppercase">AI-Powered Analytics</span>
+              </div>
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-900 tracking-tight">
+                Arcadian GSC Insights
+              </h1>
+              <p className="text-sm sm:text-base text-slate-500 mt-1">
+                Transform your Google Search Console data into actionable insights
+              </p>
             </div>
-          )}
+            {/* Export Button */}
+            {!isInitialLoad && !error && summary && (
+              <div className="flex-shrink-0">
+                <Suspense fallback={<ComponentLoader />}>
+                  <ExportButton
+                    dateRange={dateRange}
+                    summary={summary}
+                    chartData={chartData}
+                    insights={insights}
+                    chartElementId="performance-chart"
+                  />
+                </Suspense>
+              </div>
+            )}
+          </div>
         </header>
 
         {/* Date Range Picker */}
-        <div className="mb-6 bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 p-4 sm:p-6 border border-white/50 animate-fadeIn">
-          <h2 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-            <div className="p-2 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg shadow-md">
-              <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-              </svg>
-            </div>
-            Select Date Range
+        <div className="mb-6 bg-white rounded-xl shadow-sm border border-slate-200 p-4 sm:p-6 animate-fadeIn">
+          <h2 className="text-sm font-semibold text-slate-700 mb-4 flex items-center gap-2 uppercase tracking-wide">
+            <svg className="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+            Date Range
           </h2>
           <DateRangePicker
             onApply={handleApplyDateRange}
@@ -128,9 +121,9 @@ export default function Home() {
         {/* Loading State - Initial Indexing */}
         {isInitialLoad && loadingData && (
           <div className="flex flex-col items-center justify-center py-16 sm:py-20 lg:py-24">
-            <div className="animate-spin rounded-full h-12 w-12 sm:h-16 sm:w-16 border-b-2 border-blue-600 mb-4"></div>
-            <p className="text-gray-600 text-base sm:text-lg font-medium">Loading data...</p>
-            <p className="text-gray-500 text-xs sm:text-sm mt-2 text-center px-4">
+            <div className="animate-spin rounded-full h-12 w-12 sm:h-16 sm:w-16 border-b-2 border-indigo-600 mb-4"></div>
+            <p className="text-slate-700 text-base sm:text-lg font-medium">Loading data...</p>
+            <p className="text-slate-500 text-xs sm:text-sm mt-2 text-center px-4">
               Indexing CSV file (this may take a minute)...
             </p>
           </div>
@@ -199,18 +192,16 @@ export default function Home() {
             )}
 
             {/* Chart */}
-            <div id="performance-chart" className="mb-6 bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 p-4 sm:p-6 lg:p-8 border border-white/50 animate-fadeIn">
-              <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4 sm:mb-6 flex items-center gap-2">
-                <div className="p-2 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg shadow-md">
-                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                  </svg>
-                </div>
+            <div id="performance-chart" className="mb-6 bg-white rounded-xl shadow-sm border border-slate-200 p-4 sm:p-6 lg:p-8 animate-fadeIn">
+              <h2 className="text-sm font-semibold text-slate-700 mb-4 sm:mb-6 flex items-center gap-2 uppercase tracking-wide">
+                <svg className="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>
                 Performance Trends
               </h2>
               {loadingData ? (
                 <div className="flex items-center justify-center h-64 sm:h-80 lg:h-96">
-                  <div className="animate-spin rounded-full h-8 w-8 sm:h-10 sm:w-10 border-b-2 border-blue-600"></div>
+                  <div className="animate-spin rounded-full h-8 w-8 sm:h-10 sm:w-10 border-b-2 border-indigo-600"></div>
                 </div>
               ) : (
                 <Suspense fallback={<ComponentLoader />}>

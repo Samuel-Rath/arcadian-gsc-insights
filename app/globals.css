@@ -1,10 +1,13 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f9fafb;
-  --foreground: #111827;
-  --gradient-start: #667eea;
-  --gradient-end: #764ba2;
+  --background: #f8fafc;
+  --foreground: #0f172a;
+  --accent: #4f46e5;
+  --accent-light: #eef2ff;
+  --surface: #ffffff;
+  --border: #e2e8f0;
+  --muted: #64748b;
 }
 
 @theme inline {
@@ -34,7 +37,7 @@ html {
 
 /* Focus styles for accessibility */
 *:focus-visible {
-  outline: 2px solid #3b82f6;
+  outline: 2px solid #4f46e5;
   outline-offset: 2px;
 }
 
