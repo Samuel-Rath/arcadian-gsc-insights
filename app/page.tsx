@@ -10,7 +10,6 @@ import { useDateRange } from '@/hooks/useDateRange';
 
 // Lazy load heavy components
 const ClicksChart = lazy(() => import('@/components/ClicksChart'));
-const AnalyticsSummary = lazy(() => import('@/components/AnalyticsSummary'));
 const InsightsPanel = lazy(() => import('@/components/InsightsPanel'));
 const ExportButton = lazy(() => import('@/components/ExportButton'));
 
@@ -184,12 +183,7 @@ export default function Home() {
               </div>
             )}
 
-            {/* Analytics Summary */}
-            {chartData.length > 0 && (
-              <Suspense fallback={<ComponentLoader />}>
-                <AnalyticsSummary data={chartData} />
-              </Suspense>
-            )}
+
 
             {/* Chart */}
             <div id="performance-chart" className="mb-6 bg-white rounded-xl shadow-sm border border-slate-200 p-4 sm:p-6 lg:p-8 animate-fadeIn">

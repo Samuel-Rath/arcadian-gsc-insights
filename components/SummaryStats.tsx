@@ -31,19 +31,14 @@ export default function SummaryStats({
     return num.toFixed(1);
   };
 
-  // Calculate derived metrics for better insights
   const derivedMetrics = useMemo(() => {
-    const clicksPerDay = totalClicks / Math.max(1, Math.ceil((new Date(endDate).getTime() - new Date(startDate).getTime()) / (1000 * 60 * 60 * 24)));
-    const impressionsPerDay = totalImpressions / Math.max(1, Math.ceil((new Date(endDate).getTime() - new Date(startDate).getTime()) / (1000 * 60 * 60 * 24)));
-    
+    const days = Math.max(1, Math.ceil((new Date(endDate).getTime() - new Date(startDate).getTime()) / (1000 * 60 * 60 * 24)));
     return {
-      clicksPerDay: clicksPerDay.toFixed(0),
-      impressionsPerDay: impressionsPerDay.toFixed(0),
-      clickThroughRate: avgCtr,
+      clicksPerDay: (totalClicks / days).toFixed(0),
+      impressionsPerDay: (totalImpressions / days).toFixed(0),
       positionQuality: avgPosition <= 10 ? 'Excellent' : avgPosition <= 20 ? 'Good' : avgPosition <= 30 ? 'Fair' : 'Needs Improvement',
-      positionColor: avgPosition <= 10 ? 'text-green-600' : avgPosition <= 20 ? 'text-blue-600' : avgPosition <= 30 ? 'text-yellow-600' : 'text-red-600',
     };
-  }, [totalClicks, totalImpressions, avgCtr, avgPosition, startDate, endDate]);
+  }, [totalClicks, totalImpressions, avgPosition, startDate, endDate]);
 
   return (
     <div className="w-full">
@@ -107,35 +102,6 @@ export default function SummaryStats({
           </div>
           <p className="text-2xl sm:text-3xl font-bold text-slate-900 mb-1">{formatPosition(avgPosition)}</p>
           <p className="text-xs text-slate-500">Avg search position</p>
-        </div>
-      </div>
-
-      <div className="bg-white border border-slate-200 rounded-lg p-3 sm:p-4 shadow-sm">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-          <p className="text-xs sm:text-sm text-slate-600">
-            <span className="font-medium text-slate-800">Period:</span>{' '}
-            <span className="font-semibold text-indigo-700">{startDate}</span>
-            {' '}<span className="text-slate-400">→</span>{' '}
-            <span className="font-semibold text-indigo-700">{endDate}</span>
-          </p>
-          <div className="flex items-center gap-4 text-xs text-slate-500">
-            <div className="flex items-center gap-1.5">
-              <div className="w-2 h-2 rounded-full bg-indigo-500"></div>
-              <span>Clicks</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <div className="w-2 h-2 rounded-full bg-slate-400"></div>
-              <span>Impressions</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <div className="w-2 h-2 rounded-full bg-emerald-500"></div>
-              <span>CTR</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <div className="w-2 h-2 rounded-full bg-amber-500"></div>
-              <span>Position</span>
-            </div>
-          </div>
         </div>
       </div>
     </div>
