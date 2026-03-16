@@ -202,22 +202,36 @@ arcadian-gsc-insights/
 │   ├── api/
 │   │   ├── data/
 │   │   │   └── route.ts          # GET endpoint for chart data
-│   │   └── insights/
-│   │       └── route.ts          # POST endpoint for AI insights
+│   │   ├── insights/
+│   │   │   └── route.ts          # POST endpoint for AI insights
+│   │   └── upload/
+│   │       └── route.ts          # POST endpoint for CSV upload
 │   ├── page.tsx                  # Main application page
 │   ├── layout.tsx                # Root layout
 │   └── globals.css               # Global styles
 ├── lib/
 │   ├── csv-parser.ts             # Stream CSV parser
 │   ├── cache.ts                  # Cache read/write utilities
+│   ├── cache-lock.ts             # DoS prevention lock
 │   ├── aggregator.ts             # Daily aggregation logic
 │   ├── insights-builder.ts       # Compact payload builder
-│   └── claude-client.ts          # Claude API client
+│   ├── claude-client.ts          # Claude API client
+│   ├── api-utils.ts              # Shared API utilities
+│   ├── client-cache.ts           # Client-side cache
+│   ├── pdf-export.ts             # PDF export utilities
+│   ├── pdf-parser.ts             # PDF parsing utilities
+│   └── security.ts               # Security utilities
 ├── components/
 │   ├── DateRangePicker.tsx       # Date filter controls
-│   ├── ClicksChart.tsx           # Recharts line chart
+│   ├── ClicksChart.tsx           # Recharts line chart (multi-metric)
 │   ├── SummaryStats.tsx          # Aggregate metrics display
-│   └── InsightsPanel.tsx         # AI insights display
+│   ├── InsightsPanel.tsx         # AI insights display
+│   ├── FileUpload.tsx            # CSV file upload
+│   └── ExportButton.tsx          # PDF/export functionality
+├── hooks/
+│   ├── useData.ts                # Data fetching hook
+│   ├── useInsights.ts            # Insights generation hook
+│   └── useDateRange.ts           # Date range state hook
 ├── types/
 │   └── index.ts                  # TypeScript interfaces
 ├── .data-cache/

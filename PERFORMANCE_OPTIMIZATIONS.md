@@ -51,9 +51,8 @@ clientCache.set(cacheKey, data, ttl);
 
 #### Components Lazy Loaded
 1. **ClicksChart** - Recharts library (~100KB)
-2. **AnalyticsSummary** - Complex calculations
-3. **InsightsPanel** - Large component tree
-4. **ExportButton** - PDF libraries (~200KB)
+2. **InsightsPanel** - Large component tree
+3. **ExportButton** - PDF libraries (~200KB)
 
 #### Benefits
 - **Smaller initial bundle**: ~300KB reduction
@@ -84,8 +83,7 @@ const ClicksChart = lazy(() => import('@/components/ClicksChart'));
 
 #### Memoized Components
 1. **ClicksChart** - Expensive chart rendering
-2. **AnalyticsSummary** - Complex calculations
-3. **CustomTooltip** - Frequent hover events
+2. **CustomTooltip** - Frequent hover events
 
 #### Benefits
 - **Fewer re-renders**: Only update when props change

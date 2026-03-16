@@ -75,52 +75,56 @@ Enhanced `components/ClicksChart.tsx` with:
 
 #### Interactive Metric Toggle
 - Added toggle buttons above the chart for each metric:
-  - **Clicks** (blue) - Default visible
-  - **Impressions** (purple)
-  - **CTR %** (green) - Converted to percentage for better scale
-  - **Position** (orange)
+  - **Clicks** (indigo) - Default visible
+  - **Impressions** (slate)
+  - **CTR %** (emerald) - Converted to percentage for better scale
+  - **Position** (amber)
 - Users can click buttons to show/hide metrics
-- Visual feedback with colored borders and backgrounds
+- Visual feedback with active/inactive button states
 
 #### Multiple Line Support
-- Chart now renders up to 4 lines simultaneously
-- Each metric has its own color matching the summary stats
+- Chart renders up to 4 lines simultaneously
+- Each metric has its own colour matching the summary stats
 - Smooth transitions when toggling metrics
-- All metrics visible in tooltip regardless of visibility
+- All metrics visible in tooltip regardless of line visibility
 
 #### State Management
 - `visibleLines` state tracks which metrics are shown
 - `handleLegendClick()` toggles metric visibility
-- Normalized data for better visualization (CTR as percentage)
+- Normalised data for better visualisation (CTR as percentage)
 
 ### Benefits
 - **Data Exploration**: Users can compare multiple metrics
 - **Clarity**: What you see in the chart matches what's in the tooltip
 - **Flexibility**: Toggle metrics on/off based on analysis needs
-- **Visual Consistency**: Colors match summary stat cards
+- **Visual Consistency**: Colours match summary stat cards
 
-## 4. Additional UI Polish
+## 4. UI Polish and Professional Colour Scheme
+
+### Colour Scheme
+Replaced multi-colour gradients with a professional slate/indigo palette:
+- Background: `slate-50`, clean and neutral
+- Stat cards: white with slate borders, indigo accent on primary metric
+- Chart lines: indigo (clicks), slate (impressions), emerald (CTR), amber (position)
+- Buttons: solid `indigo-600`
+- Status badges: emerald/amber/red only where semantically meaningful
 
 ### Enhanced Animations
-Added smooth animations throughout:
+Smooth animations throughout:
 - `animate-fadeIn` class for cards on load
-- Scale transforms on button hover (`hover:scale-105`)
-- Active state feedback (`active:scale-95`)
 - Smooth transitions on all interactive elements
 
 ### Improved Button Styles
-- Gradient backgrounds (`from-blue-600 to-blue-700`)
-- Enhanced hover states with darker gradients
-- Shadow effects (`shadow-sm hover:shadow-md`)
+- Solid indigo backgrounds
+- Enhanced hover states
 - Loading spinners with proper sizing
-- Disabled states with gray gradients
+- Disabled states
 
 ### Better Visual Hierarchy
 - Consistent rounded corners (`rounded-xl` for cards)
-- Layered shadows for depth
-- Gradient backgrounds on page and cards
+- Subtle shadows for depth
 - Icon integration in section headers
-- Color-coded metric cards with hover effects
+- Colour-coded metric cards with hover effects
 
 ### Responsive Design
 - Mobile-first approach with `sm:` and `lg:` breakpoints
@@ -159,15 +163,16 @@ Added smooth animations throughout:
 ├── components/
 │   ├── ClicksChart.tsx            # Enhanced with multi-metric support
 │   ├── DateRangePicker.tsx        # Improved button styles
+│   ├── ExportButton.tsx           # PDF export
 │   ├── FileUpload.tsx             # Enhanced hover states
 │   ├── InsightsPanel.tsx          # Better loading states
-│   └── SummaryStats.tsx           # Consistent styling
-├── hooks/                         # NEW: Custom hooks
+│   └── SummaryStats.tsx           # Quality indicators, per-day metrics
+├── hooks/                         # Custom hooks
 │   ├── useData.ts
 │   ├── useInsights.ts
 │   └── useDateRange.ts
 └── lib/
-    ├── api-utils.ts               # NEW: Shared API utilities
+    ├── api-utils.ts               # Shared API utilities
     ├── aggregator.ts
     ├── cache.ts
     ├── claude-client.ts

@@ -55,7 +55,8 @@ arcadian-gsc-insights/
 ├── app/
 │   ├── api/
 │   │   ├── data/route.ts          # Data endpoint with validation
-│   │   └── insights/route.ts      # Insights endpoint with rate limiting
+│   │   ├── insights/route.ts      # Insights endpoint with rate limiting
+│   │   └── upload/route.ts        # CSV upload endpoint
 │   ├── page.tsx                   # Main application page
 │   ├── layout.tsx                 # Root layout
 │   └── globals.css                # Global styles
@@ -66,28 +67,30 @@ arcadian-gsc-insights/
 │   ├── aggregator.ts              # Daily aggregation logic
 │   ├── insights-builder.ts        # Compact payload builder
 │   ├── claude-client.ts           # Claude API client with security
-│   └── security.ts                # Security utilities (NEW)
+│   ├── api-utils.ts               # Shared API utilities
+│   ├── client-cache.ts            # Client-side cache
+│   ├── pdf-export.ts              # PDF export utilities
+│   ├── pdf-parser.ts              # PDF parsing utilities
+│   └── security.ts                # Security utilities
 ├── components/
 │   ├── DateRangePicker.tsx        # Date filter controls
-│   ├── ClicksChart.tsx            # Recharts line chart
+│   ├── ClicksChart.tsx            # Recharts line chart (multi-metric)
 │   ├── SummaryStats.tsx           # Aggregate metrics display
-│   └── InsightsPanel.tsx          # AI insights display
+│   ├── InsightsPanel.tsx          # AI insights display
+│   ├── FileUpload.tsx             # CSV file upload
+│   └── ExportButton.tsx           # PDF/export functionality
+├── hooks/
+│   ├── useData.ts                 # Data fetching hook
+│   ├── useInsights.ts             # Insights generation hook
+│   └── useDateRange.ts            # Date range state hook
 ├── types/
 │   └── index.ts                   # TypeScript interfaces
 ├── .data-cache/
 │   └── daily-aggregates.json      # Cached daily aggregates
-├── docs/
-│   ├── SECURITY.md                # Security documentation (NEW)
-│   ├── SECURITY_IMPLEMENTATION_SUMMARY.md (NEW)
-│   ├── SECURITY_QUICK_REFERENCE.md (NEW)
-│   ├── TESTING_CHECKLIST.md      # Testing checklist
-│   ├── FINAL_TEST_REPORT.md      # Final test report
-│   └── PROJECT_COMPLETION_SUMMARY.md (this file)
 ├── .env.local                     # Environment variables
-├── LICENSE                        # MIT License (NEW)
+├── LICENSE                        # MIT License
 ├── README.md                      # Project documentation
-├── package.json                   # Dependencies with author info
-└── tsconfig.json                  # TypeScript configuration
+└── package.json                   # Dependencies
 ```
 
 ---
