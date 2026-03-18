@@ -81,7 +81,8 @@ const ClicksChart = memo(({ data }: ClicksChartProps) => {
   return (
     <div className="w-full">
       {/* Metric Toggle Buttons */}
-      <div className="flex flex-wrap gap-2 mb-4">
+      <div className="flex flex-wrap items-center gap-2 mb-4">
+        <span className="text-xs text-slate-400 font-medium uppercase tracking-wide mr-1">Show:</span>
         {[
           { key: 'clicks', label: 'Clicks', color: 'bg-indigo-500' },
           { key: 'impressions', label: 'Impressions', color: 'bg-slate-400' },
@@ -91,6 +92,7 @@ const ClicksChart = memo(({ data }: ClicksChartProps) => {
           <button
             key={key}
             onClick={() => handleLegendClick(key)}
+            title={`Toggle ${label} line`}
             className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all duration-150 flex items-center gap-1.5 border ${
               visibleLines[key as keyof typeof visibleLines]
                 ? 'bg-slate-900 text-white border-slate-900'
