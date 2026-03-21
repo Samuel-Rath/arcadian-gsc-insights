@@ -1,14 +1,14 @@
 # Arcadian GSC Insights
 
-A Next.js application that processes large Google Search Console CSV files, provides interactive data visualization with date filtering, and generates AI-powered insights using Claude API with intelligent data summarization.
+A Next.js application that processes large Google Search Console CSV files, provides interactive data visualisation with date filtering, and generates AI-powered insights using Claude API with intelligent data summarisation.
 
 ## Overview
 
-This application solves the challenge of analyzing large (200+ MB) Google Search Console export files by:
+This application solves the challenge of analysing large (200+ MB) Google Search Console export files by:
 
 - **Server-side streaming processing** - Never loads the entire CSV into memory or browser
 - **Intelligent caching** - Builds daily aggregates on first run, uses cached data for subsequent requests
-- **Interactive visualization** - Recharts-powered line chart with date range filtering
+- **Interactive visualisation** - Recharts-powered line chart with date range filtering
 - **AI-powered insights** - Claude API analyzes trends, anomalies, and opportunities using compact statistical summaries
 
 ## Features
@@ -29,7 +29,7 @@ This application implements comprehensive security measures including:
 - Input validation (date ranges, payload sizes)
 - DoS prevention (cache locks, streaming parser)
 - Prompt injection defense (secure system prompts, response validation)
-- Error message sanitization (no sensitive data leakage)
+- Error message sanitisation (no sensitive data leakage)
 
 For detailed security information, see [SECURITY.md](./SECURITY.md).
 
@@ -84,7 +84,7 @@ For detailed security information, see [SECURITY.md](./SECURITY.md).
    - Use the date pickers to filter the date range
    - Click "Generate Insights" to get AI-powered analysis of your data
 
-That's it! Your GSC data is now visualized and ready for analysis.
+That's it! Your GSC data is now visualised and ready for analysis.
 
 ## Environment Variables
 
@@ -182,7 +182,7 @@ This application follows four key architectural decisions:
 - Stays well under API limits
 - Structured JSON helps Claude generate consistent output
 
-### 4. Recharts for Visualization
+### 4. Recharts for Visualisation
 
 **Problem:** Need interactive chart with tooltips.
 
